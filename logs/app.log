@@ -1,0 +1,20 @@
+{"level":"info","ts":"2025-04-27T22:32:15.314+0700","caller":"app/app.go:40","msg":"Инициализация приложения (configPath: config.yaml, port: :8080)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.314+0700","caller":"app/app.go:45","msg":"Запущено отслеживание изменений конфигурации","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.314+0700","caller":"app/app.go:114","msg":"Приложение запущено и готово к работе на порту :8080","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.314+0700","caller":"app/app.go:52","msg":"Получена новая конфигурация (метод балансировки: WeightedRoundRobin)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.315+0700","caller":"app/app.go:65","msg":"Начало реконфигурации приложения","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.315+0700","caller":"app/app.go:72","msg":"Создан новый балансировщик нагрузки (метод: WeightedRoundRobin)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.315+0700","caller":"app/app.go:75","msg":"Создан новый rate limiter (rate: 100.00, burst: 200)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.315+0700","caller":"app/app.go:81","msg":"Создан новый прокси-сервер","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:15.315+0700","caller":"app/app.go:101","msg":"Выполняется первичный запуск прокси","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"error","ts":"2025-04-27T22:32:15.315+0700","caller":"app/app.go:54","msg":"Ошибка при реконфигурации приложения: failed to start proxy: listen tcp :8080: bind: address already in use","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.370+0700","caller":"app/app.go:40","msg":"Инициализация приложения (configPath: config.yaml, port: :8080)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.370+0700","caller":"app/app.go:45","msg":"Запущено отслеживание изменений конфигурации","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.370+0700","caller":"app/app.go:114","msg":"Приложение запущено и готово к работе на порту :8080","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.370+0700","caller":"app/app.go:52","msg":"Получена новая конфигурация (метод балансировки: WeightedRoundRobin)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.370+0700","caller":"app/app.go:65","msg":"Начало реконфигурации приложения","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.370+0700","caller":"app/app.go:72","msg":"Создан новый балансировщик нагрузки (метод: WeightedRoundRobin)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.371+0700","caller":"app/app.go:75","msg":"Создан новый rate limiter (rate: 100.00, burst: 200)","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.371+0700","caller":"app/app.go:81","msg":"Создан новый прокси-сервер","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:32:35.371+0700","caller":"app/app.go:101","msg":"Выполняется первичный запуск прокси","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}
+{"level":"info","ts":"2025-04-27T22:34:26.122+0700","caller":"app/app.go:122","msg":"Получен сигнал завершения работы: interrupt","NodeIP":"10.0.0.1","PodIP":"10.0.1.1","ServiceName":"load-balancer"}

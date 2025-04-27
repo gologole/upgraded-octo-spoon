@@ -1,3 +1,5 @@
-# proxy
-# upgraded-octo-spoon
-# upgraded-octo-spoon
+- [ ] Базовый прокси функционал (стандартный net/http)
+- [ ] health checks серверов
+- [ ] gracefull shutdown
+- [ ] token bucket с настройкой конкретного пользователя через CRUD
+- [ ] Конфигурация должна быть независима от кода (изменения конфигурации без перекомпиляции).
