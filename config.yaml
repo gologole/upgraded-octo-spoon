@@ -1,6 +1,6 @@
 # Конфигурация балансировщика нагрузки
 loadBalancer:
-  method: WeightedRoundRobin
+  method: RoundRobin
   params:
     healthCheckInterval: 10s
 
@@ -8,14 +8,18 @@ loadBalancer:
 backends:
   - id: backend1
     url: http://localhost:8081
-    weight: 2.0
     connectTimeout: 5s
     readTimeout: 10s
     maxConnections: 100
 
   - id: backend2
     url: http://localhost:8082
-    weight: 1.0
+    connectTimeout: 5s
+    readTimeout: 10s
+    maxConnections: 100
+
+  - id: backend3
+    url: http://localhost:8083
     connectTimeout: 5s
     readTimeout: 10s
     maxConnections: 100
@@ -29,7 +33,7 @@ rateLimiter:
     burst: 200 # максимальный размер корзины
 
 logger:
-  logLevel: "info"
+  logLevel: "debug"
   nodeIP: "10.0.0.1"
   podIP: "10.0.1.1"
   serviceName: "load-balancer"   

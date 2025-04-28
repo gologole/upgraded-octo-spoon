@@ -1,13 +1,16 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"cloud.ru_test/internal/loadbalancer"
+	"cloud.ru_test/pkg/backend"
 
 	"cloud.ru_test/config"
 	"cloud.ru_test/internal/ratelimit"
@@ -69,6 +72,11 @@ func (a *App) reconfigure(cfg *config.Config) error {
 	if err != nil {
 		return fmt.Errorf("failed to create load balancer: %w", err)
 	}
+
+	for _, backendCfg := range cfg.Backends {
+		lb.AddBackend(backend.NewFromConfig(backendCfg))
+	}
+
 	a.appLogger.Info(fmt.Sprintf("Создан новый балансировщик нагрузки (метод: %s)", cfg.LoadBalancer.Method))
 
 	rLim := ratelimit.NewTokenBucket(cfg.RateLimiter.TokenBucket.Rate, cfg.RateLimiter.TokenBucket.Burst)
@@ -115,34 +123,53 @@ func (a *App) Run() error {
 
 	// Создаем канал для сигналов
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	// Логируем полученный сигнал
 	sig := <-sigChan
 	a.appLogger.Info(fmt.Sprintf("Получен сигнал завершения работы: %v", sig))
 
-	// Graceful shutdown
-	a.mu.Lock()
-	defer a.mu.Unlock()
+	// Graceful shutdown с таймаутом
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-	a.appLogger.Info("Начало graceful shutdown")
+	// Создаем канал для отслеживания завершения
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
 
-	if a.proxy != nil {
-		if err := a.proxy.Stop(); err != nil {
-			a.appLogger.Error(fmt.Sprintf("Ошибка при остановке прокси: %v", err))
-		} else {
-			a.appLogger.Info("Прокси успешно остановлен")
+		a.mu.Lock()
+		defer a.mu.Unlock()
+
+		a.appLogger.Info("Начало graceful shutdown")
+
+		if a.proxy != nil {
+			a.appLogger.Info("Остановка прокси-сервера")
+			if err := a.proxy.Stop(); err != nil {
+				a.appLogger.Error(fmt.Sprintf("Ошибка при остановке прокси: %v", err))
+			} else {
+				a.appLogger.Info("Прокси-сервер успешно остановлен")
+			}
 		}
-	}
 
-	if err := a.configManager.Close(); err != nil {
-		a.appLogger.Error(fmt.Sprintf("Ошибка при закрытии менеджера конфигурации: %v", err))
-	} else {
-		a.appLogger.Info("Менеджер конфигурации успешно закрыт")
-	}
+		if err := a.configManager.Close(); err != nil {
+			a.appLogger.Error(fmt.Sprintf("Ошибка при закрытии менеджера конфигурации: %v", err))
+		} else {
+			a.appLogger.Info("Менеджер конфигурации успешно закрыт")
+		}
 
-	a.appLogger.Info("Приложение успешно завершило работу")
-	return nil
+		a.appLogger.Info("Graceful shutdown успешно завершен")
+	}()
+
+	// Ожидаем завершения с таймаутом
+	select {
+	case <-shutdownCtx.Done():
+		a.appLogger.Error("Превышен таймаут graceful shutdown, выполняется принудительное завершение")
+		return fmt.Errorf("graceful shutdown timeout exceeded")
+	case <-done:
+		a.appLogger.Info("Приложение успешно завершило работу")
+		return nil
+	}
 }
 
 func Run(configPath, port string) error {
@@ -151,5 +178,9 @@ func Run(configPath, port string) error {
 		return fmt.Errorf("failed to create app: %w", err)
 	}
 
-	return app.Run()
+	if err := app.Run(); err != nil {
+		return fmt.Errorf("error running app: %w", err)
+	}
+
+	return nil
 }

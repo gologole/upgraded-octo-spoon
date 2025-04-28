@@ -6,6 +6,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"cloud.ru_test/config"
 )
 
 // LoadStats содержит статистику загруженности бэкенда
@@ -27,6 +29,9 @@ type LoadStats struct {
 type Backend interface {
 	// ID возвращает уникальный идентификатор бэкенда
 	ID() string
+
+	// URL возвращает полный URL бэкенда
+	URL() string
 
 	// Weight возвращает текущий вес бэкенда
 	Weight() float64
@@ -66,6 +71,15 @@ type BaseBackend struct {
 	lastSuccessTime time.Time
 }
 
+// NewFromConfig создает новый бэкенд из конфигурации
+func NewFromConfig(cfg config.BackendConfig) Backend {
+	weight := 1.0
+	if cfg.Weight != nil {
+		weight = *cfg.Weight
+	}
+	return NewBackend(cfg.ID, cfg.URL, weight)
+}
+
 // NewBackend создает новый бэкенд
 func NewBackend(id, url string, weight float64) *BaseBackend {
 	b := &BaseBackend{
@@ -88,6 +102,10 @@ func NewBackend(id, url string, weight float64) *BaseBackend {
 
 func (b *BaseBackend) ID() string {
 	return b.id
+}
+
+func (b *BaseBackend) URL() string {
+	return b.url
 }
 
 func (b *BaseBackend) Weight() float64 {
@@ -115,13 +133,8 @@ func (b *BaseBackend) Handle(ctx context.Context, req *http.Request) (*http.Resp
 	atomic.AddInt64(&b.stats.ActiveConnections, 1)
 	defer atomic.AddInt64(&b.stats.ActiveConnections, -1)
 
-	// Клонируем запрос и обновляем URL
-	outReq := req.Clone(ctx)
-	outReq.URL.Host = b.url
-	outReq.Host = b.url
-
-	// Отправляем запрос
-	resp, err := b.client.Do(outReq)
+	// Отправляем запрос напрямую, так как URL уже сформирован в transport
+	resp, err := b.client.Do(req)
 
 	// Обновляем статистику
 	duration := time.Since(start)
